@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard de Treino com GIFs de Exercícios - 8 Semanas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b1120;
+            --card-bg: #152035;
+            --accent-color: #10b981;
+            --accent-hover: #059669;
+            --blue-color: #3b82f6;
+            --purple-color: #a855f7;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #23324d;
+            --input-bg: #0b1120;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 1.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            margin-top: 4px;
+        }
+
+        .main-tab-bar {
+            display: flex;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 16px;
+            gap: 4px;
+        }
+
+        .main-tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px 4px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .main-tab-btn.active {
+            background-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+        .progress-card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-title {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-bg {
+            background-color: var(--input-bg);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background-color: var(--accent-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .pill-group {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            scrollbar-width: none;
+        }
+
+        .pill-group::-webkit-scrollbar {
+            display: none;
+        }
+
+        .pill-btn {
+            background-color: var(--card-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pill-btn.active {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border-color: var(--accent-color);
+        }
+
+        .workout-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .workout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .workout-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .badge-musculacao {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--accent-color);
+        }
+
+        .badge-corrida {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .badge-descanso {
+            background-color: rgba(148, 163, 184, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .exercise-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .exercise-main-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exercise-load-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .load-input {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            width: 100px;
+            outline: none;
+        }
+
+        .load-input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .load-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .exercise-item:last-child {
+            border-bottom: none;
+        }
+
+        .exercise-info {
+            flex: 1;
+            padding-right: 12px;
+        }
+
+        .exercise-name {
+            font-size: 0.92rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .exercise-detail {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-gif {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: #a855f7;
+            background-color: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            padding: 5px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-gif:hover {
+            background-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .checkbox-custom {
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            border: 2px solid var(--border-color);
+            background-color: var(--input-bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .checkbox-custom.checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .checkbox-custom.checked::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .notes-area {
+            margin-top: 16px;
+        }
+
+        .notes-input {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            resize: vertical;
+            min-height: 70px;
+            outline: none;
+        }
+
+        .notes-input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-top: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit.completed {
+            background-color: #27354f;
+            color: var(--text-secondary);
+        }
+
+        .metrics-card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .metric-input-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .metric-input-group input {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        .evolution-card, .profile-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .evolution-title, .profile-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .kpi-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .kpi-val {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin-top: 4px;
+        }
+
+        .kpi-label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 12px auto;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-group-full {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--text-primary);
+            font-size: 0.88rem;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .bmi-card {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            margin-top: 14px;
+        }
+
+        .bmi-val {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--accent-color);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .modal-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .modal-close {
+            background: #f1f5f9;
+            border: none;
+            color: #64748b;
+            font-size: 1.2rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .gif-display-area {
+            background-color: #ffffff;
+            border-radius: 14px;
+            padding: 10px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gif-img {
+            width: 100%;
+            max-height: 280px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        .gif-description {
+            font-size: 0.85rem;
+            color: #334155;
+            margin-top: 14px;
+            line-height: 1.5;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>📱 Dashboard de Treino</h1>
+        <p>Plano Híbrido 8 Semanas (Musculação + Corrida)</p>
+    </div>
+
+    <div class="main-tab-bar">
+        <button class="main-tab-btn active" id="btn-tab-diario" onclick="switchMainTab('diario')">🏋️ Diario</button>
+        <button class="main-tab-btn" id="btn-tab-evolucao" onclick="switchMainTab('evolucao')">📈 Evolução</button>
+        <button class="main-tab-btn" id="btn-tab-perfil" onclick="switchMainTab('perfil')">👤 Meu Perfil</button>
+    </div>
+
+    <!-- ABA 1: REGISTRO DIÁRIO DE TREINOS -->
+    <div id="view-diario">
+        <div class="progress-card">
+            <div class="progress-title">
+                <span>Progresso Total da Semana</span>
+                <span id="progress-text">0/21 Exercícios da Sem. 1</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="section-title">SELECIONAR SEMANA:</div>
+        <div class="pill-group" id="weeks-pill">
+            <button class="pill-btn active" onclick="selectWeek(1)">Semana 1</button>
+            <button class="pill-btn" onclick="selectWeek(2)">Semana 2</button>
+            <button class="pill-btn" onclick="selectWeek(3)">Semana 3</button>
+            <button class="pill-btn" onclick="selectWeek(4)">Semana 4</button>
+            <button class="pill-btn" onclick="selectWeek(5)">Semana 5</button>
+            <button class="pill-btn" onclick="selectWeek(6)">Semana 6</button>
+            <button class="pill-btn" onclick="selectWeek(7)">Semana 7</button>
+            <button class="pill-btn" onclick="selectWeek(8)">Semana 8</button>
+        </div>
+
+        <div class="section-title">SELECIONAR DIA DA SEMANA:</div>
+        <div class="pill-group" id="days-pill">
+            <button class="pill-btn active" onclick="selectDay('segunda')">Segunda</button>
+            <button class="pill-btn" onclick="selectDay('terca')">Terça</button>
+            <button class="pill-btn" onclick="selectDay('quarta')">Quarta</button>
+            <button class="pill-btn" onclick="selectDay('quinta')">Quinta</button>
+            <button class="pill-btn" onclick="selectDay('sexta')">Sexta</button>
+            <button class="pill-btn" onclick="selectDay('sabado')">Sábado</button>
+            <button class="pill-btn" onclick="selectDay('domingo')">Domingo</button>
+        </div>
+
+        <div class="workout-card" id="workout-content"></div>
+
+        <div class="metrics-card">
+            <div class="section-title">REGISTRO DE DESEMPENHO DA SEMANA</div>
+            <div class="metrics-grid">
+                <div class="metric-input-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" step="0.1" id="metric-peso" placeholder="Ex: 75.5" onchange="saveMetrics()">
+                </div>
+                <div class="metric-input-group">
+                    <label>Cintura (cm)</label>
+                    <input type="number" step="0.5" id="metric-cintura" placeholder="Ex: 82" onchange="saveMetrics()">
+                </div>
+                <div class="metric-input-group">
+                    <label>5 km (min)</label>
+                    <input type="number" step="0.1" id="metric-5km" placeholder="Ex: 27.5" onchange="saveMetrics()">
+                </div>
+                <div class="metric-input-group">
+                    <label>Sensação Geral</label>
+                    <input type="text" id="metric-obs" placeholder="Ex: Excelente" onchange="saveMetrics()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 2: EVOLUÇÃO E GRÁFICOS -->
+    <div id="view-evolucao" style="display: none;">
+        <div class="kpi-grid">
+            <div class="kpi-box">
+                <div class="kpi-label">Treinos Concluídos</div>
+                <div class="kpi-val" id="kpi-total-treinos">0 / 40</div>
+            </div>
+            <div class="kpi-box">
+                <div class="kpi-label">Adesão Total</div>
+                <div class="kpi-val" id="kpi-adesao">0%</div>
+            </div>
+            <div class="kpi-box">
+                <div class="kpi-label">Variação de Peso</div>
+                <div class="kpi-val" id="kpi-var-peso" style="color: #60a5fa;">0.0 kg</div>
+            </div>
+            <div class="kpi-box">
+                <div class="kpi-label">Variação Cintura</div>
+                <div class="kpi-val" id="kpi-var-cintura" style="color: #a855f7;">0.0 cm</div>
+            </div>
+        </div>
+
+        <div class="evolution-card">
+            <div class="evolution-title">📊 Evolução de Peso (kg) & Cintura (cm)</div>
+            <div class="chart-container">
+                <canvas id="chartPesoCintura"></canvas>
+            </div>
+        </div>
+
+        <div class="evolution-card">
+            <div class="evolution-title">🏃‍♂️ Tempo Corrida 5 km (minutos)</div>
+            <div class="chart-container">
+                <canvas id="chartCorrida"></canvas>
+            </div>
+        </div>
+
+        <div class="evolution-card">
+            <div class="evolution-title">💪 Evolução de Carga nos Exercícios Principais (kg)</div>
+            <div style="margin-bottom: 10px;">
+                <label style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 4px;">Selecione o Exercício:</label>
+                <select id="exercise-select-chart" class="load-input" style="width: 100%;" onchange="renderEvolutionCharts()">
+                    <!-- Preenchido dinamicamente -->
+                </select>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartCarga"></canvas>
+            </div>
+        </div>
+
+        <div class="evolution-card">
+            <div class="evolution-title">✅ % de Conclusão Semanal</div>
+            <div class="chart-container">
+                <canvas id="chartTreinos"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 3: PERFIL DO USUÁRIO & MEDIDAS -->
+    <div id="view-perfil" style="display: none;">
+        <div class="profile-card">
+            <div class="profile-avatar" id="avatar-initials">💪</div>
+            <div class="profile-title" style="justify-content: center; font-size: 1.1rem;" id="profile-name-title">Meu Perfil Fitness</div>
+
+            <div class="form-grid">
+                <div class="form-group form-group-full">
+                    <label>Nome Completo</label>
+                    <input type="text" id="user-name" placeholder="Digite seu nome..." onchange="saveProfile()">
+                </div>
+                <div class="form-group">
+                    <label>Idade</label>
+                    <input type="number" id="user-age" placeholder="Ex: 28" onchange="saveProfile()">
+                </div>
+                <div class="form-group">
+                    <label>Altura (cm)</label>
+                    <input type="number" id="user-height" placeholder="Ex: 175" onchange="saveProfile()">
+                </div>
+                <div class="form-group">
+                    <label>Peso Inicial (kg)</label>
+                    <input type="number" step="0.1" id="user-init-weight" placeholder="Ex: 80.0" onchange="saveProfile()">
+                </div>
+                <div class="form-group">
+                    <label>Meta de Peso (kg)</label>
+                    <input type="number" step="0.1" id="user-target-weight" placeholder="Ex: 73.0" onchange="saveProfile()">
+                </div>
+            </div>
+
+            <div class="bmi-card">
+                <div style="font-size: 0.78rem; color: var(--text-secondary);">Índice de Massa Corporal (IMC)</div>
+                <div class="bmi-val" id="bmi-value">--</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;" id="bmi-status">Preencha Peso e Altura</div>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-title">📐 Medidas Iniciais do Corpo (cm)</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Tórax / Peito</label>
+                    <input type="number" step="0.5" id="user-chest" placeholder="Ex: 98" onchange="saveProfile()">
+                </div>
+                <div class="form-group">
+                    <label>Cintura Abdominal</label>
+                    <input type="number" step="0.5" id="user-waist" placeholder="Ex: 85" onchange="saveProfile()">
+                </div>
+                <div class="form-group">
+                    <label>Quadril</label>
+                    <input type="number" step="0.5" id="user-hip" placeholder="Ex: 100" onchange="saveProfile()">
+                </div>
+                <div class="form-group">
+                    <label>Braço Direito / Esquerdo</label>
+                    <input type="number" step="0.5" id="user-arm" placeholder="Ex: 35" onchange="saveProfile()">
+                </div>
+                <div class="form-group">
+                    <label>Coxa Direita / Esquerda</label>
+                    <input type="number" step="0.5" id="user-thigh" placeholder="Ex: 58" onchange="saveProfile()">
+                </div>
+                <div class="form-group">
+                    <label>Panturrilha</label>
+                    <input type="number" step="0.5" id="user-calf" placeholder="Ex: 38" onchange="saveProfile()">
+                </div>
+            </div>
+            <button class="btn-submit" style="margin-top: 18px;" onclick="saveProfile(true)">💾 Salvar Perfil</button>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP PARA EXIBIÇÃO DE GIFS -->
+    <div class="modal-overlay" id="gif-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-gif-title">Demonstração em Movimento</div>
+                <button class="modal-close" onclick="closeGifModal()">&times;</button>
+            </div>
+            <div class="gif-display-area" id="gif-container"></div>
+        </div>
+    </div>
+
+    <script>
+        const gifMap = {
+            "Supino máquina ou barra": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bench-Press.gif",
+                desc: "🏋️‍♂️ <b>Supino Reto:</b> Mantenha as escápulas retadas contra o banco, pés firmes no chão e desça a barra até tocar levemente o peito."
+            },
+            "Supino inclinado com halteres": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Press.gif",
+                desc: "🏋️‍♂️ <b>Supino Inclinado com Halteres:</b> Banco a 30°-45°. Eleve os halteres em linha reta mantendo os cotovelos levemente flexionados."
+            },
+            "Puxada frontal": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lat-Pulldown.gif",
+                desc: "🏋️‍♂️ <b>Puxada Frontal:</b> Peito estufado, puxe a barra em direção à parte superior do peitoral guiando o movimento com os cotovelos."
+            },
+            "Remada baixa": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Cable-Row.gif",
+                desc: "🏋️‍♂️ <b>Remada Baixa:</b> Mantenha a coluna ereta e puxe o cabo até o abdômen contraindo forte os músculos das costas."
+            },
+            "Elevação lateral": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lateral-Raise.gif",
+                desc: "🏋️‍♂️ <b>Elevação Lateral:</b> Eleve os halteres até a linha dos ombros, mantendo o abdômen contraído sem usar o balanço do corpo."
+            },
+            "Tríceps corda": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/06/Rope-Pushdown.gif",
+                desc: "🏋️‍♂️ <b>Tríceps na Polia:</b> Mantenha os cotovelos colados ao tronco e estenda os braços completamente para baixo."
+            },
+            "Rosca direta/máquina": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Curl.gif",
+                desc: "🏋️‍♂️ <b>Rosca Direta:</b> Flexione os braços trazendo a barra para cima sem mover os cotovelos para frente."
+            },
+            "Crunch na polia": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Kneeling-Cable-Crunch.gif",
+                desc: "🏋️‍♂️ <b>Crunch Abdominal:</b> Ajoelhado na polia, contraia o abdômen trazendo a cabeça em direção ao chão."
+            },
+            "Leg press": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2015/11/Leg-Press.gif",
+                desc: "🦵 <b>Leg Press 45°:</b> Pés paralelos na plataforma. Desça até 90° sem levantar a lombar do banco."
+            },
+            "Cadeira extensora": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-EXTENSION.gif",
+                desc: "🦵 <b>Cadeira Extensora:</b> Estenda completamente os joelhos no topo e retorne devagar sustentando a carga."
+            },
+            "Mesa flexora": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2022/04/Lying-Dumbbell-Leg-Curl.gif",   
+                desc: "🦵 <b>Mesa Flexora:</b> Flexione as pernas trazendo o rolo até a região glútea sem elevar o quadril."
+            },
+            "Stiff/RDL com halteres": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Romanian-Deadlift.gif",
+                desc: "🦵 <b>Stiff com Halteres:</b> Empurre o quadril para trás, mantendo a coluna retinha e os halteres rente às pernas."
+            },
+            "Hip thrust": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Hip-Thrust.gif",
+                desc: "🦵 <b>Elevação Pélvica:</b> Apoie as escápulas no banco e empurre o quadril para cima até alinhar tronco e coxas."
+            },
+            "Panturrilha": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/06/Standing-Calf-Raise.gif",
+                desc: "🦵 <b>Panturrilha em Pé:</b> Suba no ponto máximo na ponta dos pés e desça controlando o alongamento."
+            },
+            "Prancha": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2025/07/body-saw-plank.gif",
+                desc: "🧱 <b>Prancha Abdominal:</b> Antebraços apoiados no chão, mantenha o corpo alinhado da cabeça aos calcanhares."
+            },
+            "Dead bug": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dead-Bug.gif",
+                desc: "🧱 <b>Dead Bug:</b> Deitado de costas com a lombar colada no chão, alterne braço e perna opostos."
+            },
+            "Agachamento Smith ou Hack": {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/BARBELL-SQUAT.gif",
+                desc: "🦵 <b>Agachamento:</b> Desça flexionando joelhos e quadril ao mesmo tempo até passar levemente dos 90°."
+            }
+        };
+
+        const runningProgression = {
+            terca: [
+                "3' corre + 2' caminha x 6",
+                "3' corre + 2' caminha x 6",
+                "5' corre + 2' caminha x 5",
+                "5' corre + 2' caminha x 5",
+                "8' corre + 2' caminha x 4",
+                "8' corre + 2' caminha x 4",
+                "10' corre + 2' caminha x 3",
+                "30-40 min confortável"
+            ],
+            quinta: [
+                "2' corre + 2' caminha x 6",
+                "2' corre + 2' caminha x 6",
+                "3' corre + 90s caminha x 6",
+                "3' corre + 90s caminha x 6",
+                "4' corre + 90s caminha x 5",
+                "4' corre + 90s caminha x 5",
+                "5' corre + 2' caminha x 4",
+                "4 x 5' corre + 2' fácil"
+            ]
+        };
+
+        const workoutsData = {
+            segunda: {
+                title: "Segunda: Musculação A (Superiores)",
+                type: "MUSCULAÇÃO",
+                badgeClass: "badge-musculacao",
+                exercises: [
+                    { name: "Supino máquina ou barra", detail: "3 séries x 8-12 reps (Descanso: 90-120s)" },
+                    { name: "Supino inclinado com halteres", detail: "3 séries x 8-12 reps (Descanso: 90s)" },
+                    { name: "Puxada frontal", detail: "3 séries x 8-12 reps (Descanso: 90s)" },
+                    { name: "Remada baixa", detail: "3 séries x 8-12 reps (Descanso: 90s)" },
+                    { name: "Elevação lateral", detail: "3 séries x 12-15 reps (Descanso: 60s)" },
+                    { name: "Tríceps corda", detail: "2 séries x 10-15 reps (Descanso: 60s)" },
+                    { name: "Rosca direta/máquina", detail: "2 séries x 10-15 reps (Descanso: 60s)" },
+                    { name: "Crunch na polia", detail: "3 séries x 12-15 reps (Descanso: 60s)" }
+                ]
+            },
+            terca: {
+                title: "Terça: Corrida A (Base)",
+                type: "CORRIDA",
+                badgeClass: "badge-corrida",
+                exercises: []
+            },
+            quarta: {
+                title: "Quarta: Musculação B (Pernas)",
+                type: "MUSCULAÇÃO",
+                badgeClass: "badge-musculacao",
+                exercises: [
+                    { name: "Leg press", detail: "3 séries x 8-12 reps (Descanso: 120s)" },
+                    { name: "Cadeira extensora", detail: "2 séries x 10-15 reps (Descanso: 75s)" },
+                    { name: "Mesa flexora", detail: "3 séries x 10-15 reps (Descanso: 75-90s)" },
+                    { name: "Stiff/RDL com halteres", detail: "3 séries x 8-12 reps (Descanso: 120s)" },
+                    { name: "Hip thrust", detail: "3 séries x 8-12 reps (Descanso: 90-120s)" },
+                    { name: "Panturrilha", detail: "3 séries x 12-20 reps (Descanso: 60-75s)" },
+                    { name: "Prancha", detail: "3 séries x 30-45s (Descanso: 60s)" },
+                    { name: "Dead bug", detail: "2 séries x 8-12/lado (Descanso: 45-60s)" }
+                ]
+            },
+            quinta: {
+                title: "Quinta: Corrida B (Qualidade)",
+                type: "CORRIDA",
+                badgeClass: "badge-corrida",
+                exercises: []
+            },
+            sexta: {
+                title: "Sexta: Musculação C (Corpo Inteiro)",
+                type: "MUSCULAÇÃO",
+                badgeClass: "badge-musculacao",
+                exercises: [
+                    { name: "Agachamento Smith ou Hack", detail: "3 séries x 8-12 reps (Descanso: 120s)" },
+                    { name: "Supino inclinado", detail: "3 séries x 8-12 reps (Descanso: 90s)" },
+                    { name: "Remada máquina", detail: "3 séries x 8-12 reps (Descanso: 90s)" },
+                    { name: "Puxada frontal", detail: "2 séries x 10-12 reps (Descanso: 90s)" },
+                    { name: "Desenvolvimento de ombros", detail: "2 séries x 8-12 reps (Descanso: 90s)" },
+                    { name: "Elevação lateral", detail: "2 séries x 12-15 reps (Descanso: 60s)" },
+                    { name: "Flexora", detail: "2 séries x 10-15 reps (Descanso: 75s)" },
+                    { name: "Tríceps", detail: "2 séries x 10-15 reps (Descanso: 60s)" },
+                    { name: "Bíceps", detail: "2 séries x 10-15 reps (Descanso: 60s)" },
+                    { name: "Abdômen", detail: "3 séries x 12-15 reps (Descanso: 60s)" }
+                ]
+            },
+            sabado: {
+                title: "Sábado: Caminhada Opcional",
+                type: "RECUPERAÇÃO",
+                badgeClass: "badge-descanso",
+                exercises: [
+                    { name: "Caminhada leve ritmo confortável", detail: "Duração: 30-60 min (Intensidade leve)" }
+                ]
+            },
+            domingo: {
+                title: "Domingo: Descanso Total",
+                type: "RECUPERAÇÃO",
+                badgeClass: "badge-descanso",
+                exercises: [
+                    { name: "Recuperação completa / Sono", detail: "Foco em chegar à segunda-feira 100% recuperado" }
+                ]
+            }
+        };
+
+        let currentWeek = 1;
+        let currentDay = 'segunda';
+        let chartInstances = {};
+
+        function getStorageKey(week, day) {
+            return `hybrid_workout_w${week}_d${day}`;
+        }
+
+        function getMetricsKey(week) {
+            return `hybrid_metrics_w${week}`;
+        }
+
+        function switchMainTab(tab) {
+            document.getElementById('view-diario').style.display = tab === 'diario' ? 'block' : 'none';
+            document.getElementById('view-evolucao').style.display = tab === 'evolucao' ? 'block' : 'none';
+            document.getElementById('view-perfil').style.display = tab === 'perfil' ? 'block' : 'none';
+
+            document.getElementById('btn-tab-diario').classList.toggle('active', tab === 'diario');
+            document.getElementById('btn-tab-evolucao').classList.toggle('active', tab === 'evolucao');
+            document.getElementById('btn-tab-perfil').classList.toggle('active', tab === 'perfil');
+
+            if (tab === 'evolucao') {
+                populateExerciseSelector();
+                renderEvolutionCharts();
+            } else if (tab === 'perfil') {
+                loadProfile();
+            }
+        }
+
+        function selectWeek(week) {
+            currentWeek = week;
+            document.querySelectorAll('#weeks-pill .pill-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx + 1 === week);
+            });
+            renderWorkout();
+            loadMetrics();
+        }
+
+        function selectDay(day) {
+            currentDay = day;
+            const days = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+            document.querySelectorAll('#days-pill .pill-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', days[idx] === day);
+            });
+            renderWorkout();
+        }
+
+        function openGifModal(exName) {
+            const modal = document.getElementById('gif-modal');
+            const title = document.getElementById('modal-gif-title');
+            const container = document.getElementById('gif-container');
+
+            title.innerText = exName;
+
+            const item = gifMap[exName] || {
+                url: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bench-Press.gif",
+                desc: "🏋️‍♂️ <b>Execução Correta:</b> Mantenha a postura ereta e estabilizada durante todo o movimento."
+            };
+
+            container.innerHTML = `
+                <img class="gif-img" src="${item.url}" alt="${exName}" loading="lazy">
+                <div class="gif-description">${item.desc}</div>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeGifModal() {
+            document.getElementById('gif-modal').classList.remove('active');
+        }
+
+        function renderWorkout() {
+            const container = document.getElementById('workout-content');
+            let data = JSON.parse(JSON.stringify(workoutsData[currentDay]));
+
+            if (currentDay === 'terca') {
+                data.exercises = [
+                    { name: "Sessão Principal de Corrida", detail: runningProgression.terca[currentWeek - 1] },
+                    { name: "Aquecimento", detail: "5 min caminhando + mobilidade leve" },
+                    { name: "Volta à calma", detail: "5 min caminhando" }
+                ];
+            } else if (currentDay === 'quinta') {
+                data.exercises = [
+                    { name: "Sessão Qualidade de Corrida", detail: runningProgression.quinta[currentWeek - 1] },
+                    { name: "Aquecimento", detail: "8-10 min caminhada / trote leve" },
+                    { name: "Volta à calma", detail: "5 min caminhando" }
+                ];
+            }
+
+            const savedState = JSON.parse(localStorage.getItem(getStorageKey(currentWeek, currentDay)) || '{}');
+
+            let html = `
+                <div class="workout-header">
+                    <div class="workout-title">${data.title}</div>
+                    <span class="badge ${data.badgeClass}">${data.type}</span>
+                </div>
+            `;
+
+            data.exercises.forEach((ex, idx) => {
+                const isChecked = savedState.checks && savedState.checks[idx];
+                const showGifBtn = data.type === "MUSCULAÇÃO";
+                const exerciseLoad = (savedState.loads && savedState.loads[idx]) || '';
+
+                html += `
+                    <div class="exercise-item">
+                        <div class="exercise-main-row">
+                            <div class="exercise-info">
+                                <div class="exercise-name">${ex.name}</div>
+                                <div class="exercise-detail">${ex.detail}</div>
+                                ${showGifBtn ? `<button class="btn-gif" onclick="openGifModal('${ex.name}')">🎥 Ver GIF em Movimento</button>` : ''}
+                            </div>
+                            <div class="checkbox-custom ${isChecked ? 'checked' : ''}" onclick="toggleCheck(${idx})"></div>
+                        </div>
+                        ${showGifBtn ? `
+                        <div class="exercise-load-row">
+                            <span class="load-label">Carga utilizada (kg):</span>
+                            <input type="number" step="0.5" class="load-input" value="${exerciseLoad}" placeholder="Ex: 20" onchange="saveLoad(${idx}, this.value)">
+                        </div>` : ''}
+                    </div>
+                `;
+            });
+
+            const savedNotes = savedState.notes || '';
+            const isCompleted = savedState.completed || false;
+
+            html += `
+                <div class="notes-area">
+                    <textarea class="notes-input" id="workout-notes" placeholder="Anotações de carga/sensação..." oninput="saveNotes()">${savedNotes}</textarea>
+                </div>
+                <button class="btn-submit ${isCompleted ? 'completed' : ''}" onclick="toggleComplete()">
+                    ${isCompleted ? '✓ Treino Concluído' : `Marcar Treino de ${currentDay.slice(0, 3).toUpperCase()} como Concluído`}
+                </button>
+            `;
+
+            container.innerHTML = html;
+            updateProgress();
+        }
+
+        function toggleCheck(idx) {
+            let savedState = JSON.parse(localStorage.getItem(getStorageKey(currentWeek, currentDay)) || '{}');
+            if (!savedState.checks) savedState.checks = {};
+            savedState.checks[idx] = !savedState.checks[idx];
+            localStorage.setItem(getStorageKey(currentWeek, currentDay), JSON.stringify(savedState));
+            renderWorkout();
+        }
+
+        function saveLoad(idx, value) {
+            let savedState = JSON.parse(localStorage.getItem(getStorageKey(currentWeek, currentDay)) || '{}');
+            if (!savedState.loads) savedState.loads = {};
+            savedState.loads[idx] = value;
+            localStorage.setItem(getStorageKey(currentWeek, currentDay), JSON.stringify(savedState));
+        }
+
+        function saveNotes() {
+            const notes = document.getElementById('workout-notes').value;
+            let savedState = JSON.parse(localStorage.getItem(getStorageKey(currentWeek, currentDay)) || '{}');
+            savedState.notes = notes;
+            localStorage.setItem(getStorageKey(currentWeek, currentDay), JSON.stringify(savedState));
+        }
+
+        function toggleComplete() {
+            let savedState = JSON.parse(localStorage.getItem(getStorageKey(currentWeek, currentDay)) || '{}');
+            savedState.completed = !savedState.completed;
+            
+            if (savedState.completed) {
+                const totalEx = document.querySelectorAll('.checkbox-custom').length;
+                if (!savedState.checks) savedState.checks = {};
+                for (let i = 0; i < totalEx; i++) savedState.checks[i] = true;
+            }
+
+            localStorage.setItem(getStorageKey(currentWeek, currentDay), JSON.stringify(savedState));
+            renderWorkout();
+        }
+
+        function updateProgress() {
+            let totalEx = 0;
+            let completedEx = 0;
+
+            const days = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+            days.forEach(day => {
+                const state = JSON.parse(localStorage.getItem(getStorageKey(currentWeek, day)) || '{}');
+                
+                let exCount = workoutsData[day].exercises.length;
+                if (day === 'terca' || day === 'quinta') exCount = 3;
+
+                totalEx += exCount;
+
+                if (state.checks) {
+                    Object.values(state.checks).forEach(val => {
+                        if (val) completedEx++;
+                    });
+                }
+            });
+
+            const percent = totalEx > 0 ? Math.round((completedEx / totalEx) * 100) : 0;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+            document.getElementById('progress-text').innerText = `${completedEx}/${totalEx} Exercícios da Sem. ${currentWeek}`;
+        }
+
+        function loadMetrics() {
+            const metrics = JSON.parse(localStorage.getItem(getMetricsKey(currentWeek)) || '{}');
+            document.getElementById('metric-peso').value = metrics.peso || '';
+            document.getElementById('metric-cintura').value = metrics.cintura || '';
+            document.getElementById('metric-5km').value = metrics['5km'] || '';
+            document.getElementById('metric-obs').value = metrics.obs || '';
+        }
+
+        function saveMetrics() {
+            const metrics = {
+                peso: document.getElementById('metric-peso').value,
+                cintura: document.getElementById('metric-cintura').value,
+                '5km': document.getElementById('metric-5km').value,
+                obs: document.getElementById('metric-obs').value
+            };
+            localStorage.setItem(getMetricsKey(currentWeek), JSON.stringify(metrics));
+        }
+
+        function saveProfile(notify = false) {
+            const profile = {
+                name: document.getElementById('user-name').value,
+                age: document.getElementById('user-age').value,
+                height: document.getElementById('user-height').value,
+                initWeight: document.getElementById('user-init-weight').value,
+                targetWeight: document.getElementById('user-target-weight').value,
+                chest: document.getElementById('user-chest').value,
+                waist: document.getElementById('user-waist').value,
+                hip: document.getElementById('user-hip').value,
+                arm: document.getElementById('user-arm').value,
+                thigh: document.getElementById('user-thigh').value,
+                calf: document.getElementById('user-calf').value
+            };
+            localStorage.setItem('hybrid_user_profile', JSON.stringify(profile));
+            calculateBMI();
+            if (notify) {
+                alertBox("Perfil salvo com sucesso!");
+            }
+        }
+
+        function loadProfile() {
+            const profile = JSON.parse(localStorage.getItem('hybrid_user_profile') || '{}');
+            document.getElementById('user-name').value = profile.name || '';
+            document.getElementById('user-age').value = profile.age || '';
+            document.getElementById('user-height').value = profile.height || '';
+            document.getElementById('user-init-weight').value = profile.initWeight || '';
+            document.getElementById('user-target-weight').value = profile.targetWeight || '';
+            document.getElementById('user-chest').value = profile.chest || '';
+            document.getElementById('user-waist').value = profile.waist || '';
+            document.getElementById('user-hip').value = profile.hip || '';
+            document.getElementById('user-arm').value = profile.arm || '';
+            document.getElementById('user-thigh').value = profile.thigh || '';
+            document.getElementById('user-calf').value = profile.calf || '';
+
+            if (profile.name) {
+                document.getElementById('profile-name-title').innerText = profile.name;
+                const initials = profile.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+                document.getElementById('avatar-initials').innerText = initials || '💪';
+            }
+            calculateBMI();
+        }
+
+        function calculateBMI() {
+            const weight = parseFloat(document.getElementById('metric-peso').value) || parseFloat(document.getElementById('user-init-weight').value);
+            const heightCm = parseFloat(document.getElementById('user-height').value);
+
+            if (weight && heightCm) {
+                const heightM = heightCm / 100;
+                const bmi = (weight / (heightM * heightM)).toFixed(1);
+                document.getElementById('bmi-value').innerText = bmi;
+
+                let status = "Peso normal";
+                if (bmi < 18.5) status = "Abaixo do peso";
+                else if (bmi >= 25 && bmi < 30) status = "Sobrepeso";
+                else if (bmi >= 30) status = "Obesidade";
+
+                document.getElementById('bmi-status').innerText = status;
+            }
+        }
+
+        function alertBox(msg) {
+            const modal = document.getElementById('gif-modal');
+            const title = document.getElementById('modal-gif-title');
+            const container = document.getElementById('gif-container');
+            title.innerText = "Aviso";
+            container.innerHTML = `<div class="gif-description" style="text-align: center; font-size: 1rem; padding: 20px;">${msg}</div>`;
+            modal.classList.add('active');
+        }
+
+        function populateExerciseSelector() {
+            const select = document.getElementById('exercise-select-chart');
+            const currentSelected = select.value;
+            
+            let exercisesList = [];
+            const musculacaoDays = ['segunda', 'quarta', 'sexta'];
+            
+            musculacaoDays.forEach(day => {
+                workoutsData[day].exercises.forEach(ex => {
+                    if (!exercisesList.includes(ex.name)) {
+                        exercisesList.push(ex.name);
+                    }
+                });
+            });
+
+            let optionsHtml = '';
+            exercisesList.forEach(name => {
+                const selected = name === currentSelected ? 'selected' : '';
+                optionsHtml += `<option value="${name}" ${selected}>${name}</option>`;
+            });
+            select.innerHTML = optionsHtml;
+        }
+
+        function renderEvolutionCharts() {
+            const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6', 'Sem 7', 'Sem 8'];
+            const pesoData = [];
+            const cinturaData = [];
+            const corridaData = [];
+            const completionPercent = [];
+            const cargaData = [];
+
+            const selectEl = document.getElementById('exercise-select-chart');
+            const targetExerciseName = selectEl ? selectEl.value : null;
+
+            let totalTreinosConcluidos = 0;
+
+            for (let w = 1; w <= 8; w++) {
+                const m = JSON.parse(localStorage.getItem(getMetricsKey(w)) || '{}');
+                pesoData.push(m.peso ? parseFloat(m.peso) : null);
+                cinturaData.push(m.cintura ? parseFloat(m.cintura) : null);
+                corridaData.push(m['5km'] ? parseFloat(m['5km']) : null);
+
+                let completedDays = 0;
+                const days = ['segunda', 'terca', 'quarta', 'quinta', 'sexta'];
+                
+                let foundLoad = null;
+                if (targetExerciseName) {
+                    const musculacaoDays = ['segunda', 'quarta', 'sexta'];
+                    for (let day of musculacaoDays) {
+                        const st = JSON.parse(localStorage.getItem(getStorageKey(w, day)) || '{}');
+                        const exList = workoutsData[day].exercises;
+                        exList.forEach((ex, idx) => {
+                            if (ex.name === targetExerciseName && st.loads && st.loads[idx]) {
+                                foundLoad = parseFloat(st.loads[idx]);
+                            }
+                        });
+                    }
+                }
+                cargaData.push(foundLoad);
+
+                days.forEach(d => {
+                    const st = JSON.parse(localStorage.getItem(getStorageKey(w, d)) || '{}');
+                    if (st.completed) completedDays++;
+                });
+
+                totalTreinosConcluidos += completedDays;
+                completionPercent.push((completedDays / 5) * 100);
+            }
+
+            document.getElementById('kpi-total-treinos').innerText = `${totalTreinosConcluidos} / 40`;
+            document.getElementById('kpi-adesao').innerText = `${Math.round((totalTreinosConcluidos / 40) * 100)}%`;
+
+            const validPeso = pesoData.filter(v => v !== null);
+            if (validPeso.length >= 2) {
+                const diff = (validPeso[validPeso.length - 1] - validPeso[0]).toFixed(1);
+                document.getElementById('kpi-var-peso').innerText = `${diff > 0 ? '+' : ''}${diff} kg`;
+            }
+
+            const validCintura = cinturaData.filter(v => v !== null);
+            if (validCintura.length >= 2) {
+                const diff = (validCintura[validCintura.length - 1] - validCintura[0]).toFixed(1);
+                document.getElementById('kpi-var-cintura').innerText = `${diff > 0 ? '+' : ''}${diff} cm`;
+            }
+
+            createLineChart('chartPesoCintura', weeks, [
+                { label: 'Peso (kg)', data: pesoData, borderColor: '#60a5fa', backgroundColor: 'rgba(96, 165, 250, 0.1)', tension: 0.3 },
+                { label: 'Cintura (cm)', data: cinturaData, borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.1)', tension: 0.3 }
+            ]);
+
+            createLineChart('chartCorrida', weeks, [
+                { label: 'Tempo 5km (min)', data: corridaData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.3 }
+            ]);
+
+            createLineChart('chartCarga', weeks, [
+                { label: 'Carga (kg)', data: cargaData, borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.15)', fill: true, tension: 0.3 }
+            ]);
+
+            createLineChart('chartTreinos', weeks, [
+                { label: '% Concluído', data: completionPercent, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.2)', fill: true, tension: 0.3 }
+            ]);
+        }
+
+        function createLineChart(canvasId, labels, datasets) {
+            if (chartInstances[canvasId]) {
+                chartInstances[canvasId].destroy();
+            }
+
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            chartInstances[canvasId] = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: '#23324d' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#23324d' } }
+                    }
+                }
+            });
+        }
+
+        renderWorkout();
+        loadMetrics();
+        loadProfile();
+    </script>
+</body>
+</html>
